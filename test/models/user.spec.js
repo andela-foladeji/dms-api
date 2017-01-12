@@ -19,7 +19,7 @@ describe('User model', () => {
   describe('Create user', () => {
     it('should save all users details', () => {
       fakeData.user.roleId = roleId;
-      db.user.create(fakeData.user).then(user) => {
+      db.user.create(fakeData.user).then((user) => {
         userId = user.dataValues.id;
         assert.equal(fakeData.user.userName, user.dataValues.userName);
         assert.equal(fakeData.user.firstName, user.dataValues.firstName);
