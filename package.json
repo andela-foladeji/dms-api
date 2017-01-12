@@ -6,7 +6,7 @@
   "scripts": {
     "start": "babel-node server/index.js",
     "db-init": "babel-node server/setup.js",
-    "test": "cross-env NODE_ENV=test nyc --reporter=lcov mocha  test/server"
+    "test": "cross-env NODE_ENV=test nyc --reporter=lcov mocha  test/"
   },
   "repository": {
     "type": "git",
