@@ -1,4 +1,4 @@
-module.exports = function (sequelize, DataType) {
+const documentModel = (sequelize, DataType) => {
   const document = sequelize.define('document', {
     title: {
       type: DataType.STRING,
@@ -28,3 +28,5 @@ module.exports = function (sequelize, DataType) {
 
   return document;
 };
+
+export default documentModel;
