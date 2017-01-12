@@ -43,7 +43,7 @@ describe('User model', () => {
     it('ensures password is hashed', () => {
       db.user.update(fakeData.user2, {
         where: {
-          id: userId;
+          id: userId
         }
       }).then((user) => {
         assert.notEqual(user.password, fakeData.user2.password);
