@@ -1,7 +1,5 @@
-import faker from 'faker';
 import { assert } from 'chai';
 import db from '../../server/models';
-import Sequelize from 'sequelize';
 import fakeData from '../fake-data';
 
 describe('User model', () => {
@@ -47,9 +45,9 @@ describe('User model', () => {
     it('fails for invalid email', () => {
       Object.assign(newUser, fakeData.user2);
       newUser.email = 'invalid email';
-      db.user.create(newUser).then().catch(error => {
-        assert.match(error.message, /Validation isEmail failed/);
-      })
+      db.user.create(newUser).then().catch(error =>
+        assert.match(error.message, /Validation isEmail failed/)
+      );
     });
   });
 
