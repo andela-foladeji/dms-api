@@ -1,19 +1,28 @@
 import faker from 'faker';
 import { assert } from 'chai';
 import db from '../../server/models';
+import Sequelize from 'sequelize';
 import fakeData from '../fake-data';
 
 describe('User model', () => {
   let roleId, userId;
-  before(() => {
+  const requiredFields = ['firstName', 'lastName',
+    'username', 'email', 'password'];
+  const uniqueAttributes = ['email', 'username'];
+  const incompleteUser = {};
+  const newUser = {};
+  before((done) => {
     db.role.create(fakeData.role1).then((role) => {
       roleId = role.dataValues.id;
+      done();
     });
   });
 
   after((done) => {
     db.sequelize.sync({ force: true })
-      .then((done));
+      .then(() => {
+        done();
+      });
   });
 
   describe('Create user', () => {
@@ -29,18 +38,50 @@ describe('User model', () => {
     });
 
     it('does not save if roleId violates foreign key constraint', () => {
-      fakeData.user.roleId = 0;
-      assert.throws(db.user.create(fakeData.user), new ForeignKeyConstraintError());
+      fakeData.user2.roleId = 5;
+      db.user.create(fakeData.user2).then().catch(error =>
+        assert.equal(error.name, 'SequelizeForeignKeyConstraintError')
+      );
     });
 
-    it('throws unique constraint error if an existing email/username is used', () => {
-      fakeData.user.roleId = roleId;
-      assert.throws(db.user.create(fakeData.user), new UniqueConstraintError());
+    it('fails for invalid email', () => {
+      Object.assign(newUser, fakeData.user2);
+      newUser.email = 'invalid email';
+      db.user.create(newUser).then().catch(error => {
+        assert.match(error.message, /Validation isEmail failed/);
+      })
+    });
+  });
+
+  describe('Unique validations', () => {
+    uniqueAttributes.forEach((each) => {
+      Object.assign(newUser, fakeData.user2);
+      it(`fails for an existing ${each}`, () => {
+        newUser.roleId = roleId;
+        newUser[each] = fakeData.user[each];
+        db.user.create(newUser).then().catch((error) => {
+          assert.equal(error.name, 'SequelizeUniqueConstraintError');
+        });
+      });
+    });
+  });
+
+  describe('Not null validations', () => {
+    fakeData.user3.roleId = roleId;
+    requiredFields.forEach((each) => {
+      Object.assign(incompleteUser, fakeData.user3);
+      it(`it fails if ${each} is null`, () => {
+        incompleteUser[each] = null;
+        db.user.create(incompleteUser).then().catch(error =>
+          assert.match(error.message, /^notNull/)
+        );
+      });
     });
   });
 
   describe('Update user', () => {
     it('ensures password is hashed', () => {
+      fakeData.user2.roleId = roleId;
       db.user.update(fakeData.user2, {
         where: {
           id: userId
