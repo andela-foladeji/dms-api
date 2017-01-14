@@ -17,7 +17,7 @@ class RoleController {
         .then((role) => {
           res.status(200).json({ role: role.dataValues, done: true });
         }).catch(() => {
-          res.status(401).json({ done: false });
+          res.status(400).json({ done: false });
         });
     } else {
       user.returnUnAuthroized(res);
@@ -31,15 +31,11 @@ class RoleController {
    * @return {object} containing the array of roles if any;
    */
   static getRoles(req, res) {
-    if (req.decoded.role.toLowerCase() === 'admin') {
-      db.role.findAll().then((roles) => {
-        res.status(200).json({ done: true, roles });
-      }).catch(() => {
-        user.returnUnAuthroized(res);
-      });
-    } else {
-      user.returnUnAuthroized(res);
-    }
+    db.role.findAll().then((roles) => {
+      res.status(200).json({ done: true, roles });
+    }).catch((error) => {
+      res.status(500).json({ done: false, error });
+    });
   }
 }
 

@@ -2,7 +2,8 @@ const documentModel = (sequelize, DataType) => {
   const document = sequelize.define('document', {
     title: {
       type: DataType.STRING,
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     content: {
       type: DataType.TEXT,

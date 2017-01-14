@@ -43,6 +43,21 @@ describe('Document model', () => {
     });
   });
 
+  describe('unique constraints', () => {
+    it('ensures title is unique', () => {
+      const newDocument1 = {};
+      const newDocument2 = {};
+      Object.assign(newDocument1, fakeData.document);
+      newDocument1.ownerId = userInfo.id;
+      Object.assign(newDocument2, fakeData.privateDoc);
+      newDocument2.ownerId = userInfo.id;
+      newDocument2.title = newDocument1.title;
+      db.document.bulkCreate([newDocument1, newDocument2]).then().catch(error =>
+        assert.equal(error.name, 'SequelizeUniqueConstraintError')
+      );
+    });
+  });
+
   describe('foreign key constraints', () => {
     it('fails for a user that does not exist', () => {
       const newDocDetails = {};

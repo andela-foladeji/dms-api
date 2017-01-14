@@ -156,13 +156,13 @@ describe('Document related activities', () => {
     it('should update details of the document', (done) => {
       request.put('/documents/1')
         .set({ Authorization: token })
-        .send(fakeData.roleDocument)
+        .send(fakeData.updateDoc)
         .end((err, res) => {
           if (err) {
             done(err);
           }
           assert.equal(res.status, 200);
-          assert.equal(res.body.doc.title, fakeData.roleDocument.title);
+          assert.equal(res.body.doc.title, fakeData.updateDoc.title);
           done();
         });
     });
@@ -175,7 +175,7 @@ describe('Document related activities', () => {
           if (err) {
             done(err);
           }
-          assert.equal(res.status, 401);
+          assert.equal(res.status, 500);
           assert.isFalse(res.body.done);
           done();
         });
@@ -189,7 +189,7 @@ describe('Document related activities', () => {
           if (err) {
             done(err);
           }
-          assert.equal(res.status, 401);
+          assert.equal(res.status, 500);
           assert.isUndefined(res.body.doc);
           done();
         });

@@ -77,12 +77,9 @@ class DocumentsController {
       fields: ['title', 'content', 'access'],
       returning: true
     }).then((doc) => {
-      if (doc) {
-        return res.status(200).json({ done: true, doc: doc[1][0].dataValues });
-      }
-      user.returnUnAuthroized(res);
-    }).catch(() => {
-      user.returnUnAuthroized(res);
+      return res.status(200).json({ done: true, doc: doc[1][0].dataValues });
+    }).catch((error) => {
+      res.status(500).json({ done: false, error });
     });
   }
 

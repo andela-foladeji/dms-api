@@ -43,6 +43,17 @@ describe('Roles related activites', () => {
         });
     });
 
+    it('ensures that title is not null', (done) => {
+      request.post('/role')
+        .set({ Authorization: token })
+        .send(fakeData.role2)
+        .end((err, res) => {
+          assert.equal(res.status, 400);
+          assert.isFalse(res.body.done);
+          done();
+        });
+    })
+
     it('prevents a non admin user from creating a role', (done) => {
       fakeData.user2.roleId = 2;
       request.post('/users')
