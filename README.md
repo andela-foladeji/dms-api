@@ -18,6 +18,10 @@ Installation
 5.  Run tests  `npm test`
 6.  Start the app `npm start` and use [postman](https://www.getpostman.com/) to consume the API
 
+## POSTMAN COLLECTION
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/be9b49d86a8e609e34ec)
+Use the postman collection above and set up your environment variables for url and token
+
 ## API ENDPOINTS
 **Users**
 
