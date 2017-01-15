@@ -20,7 +20,6 @@ app.use('/role', role);
 
 
 app.listen(port, () => {
-  console.log(`App can be accessed on http://localhost:${port}`);
 });
 
 export default app;

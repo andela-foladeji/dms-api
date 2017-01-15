@@ -3,7 +3,7 @@ import db from '../../server/models';
 import fakeData from '../fake-data';
 
 describe('Role model', () => {
-  const newRole = {};
+  const aNewRole = {};
   after((done) => {
     db.sequelize.sync({ force: true })
       .then(() => {
@@ -19,7 +19,7 @@ describe('Role model', () => {
     });
 
     it('requires title', () => {
-      db.role.create(newRole).then().catch(error =>
+      db.role.create(aNewRole).then().catch(error =>
         assert.match(error.message, /^notNull/)
       );
     });

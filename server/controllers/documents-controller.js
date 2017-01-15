@@ -57,9 +57,9 @@ class DocumentsController {
           }
         });
       }
-    }).catch(error => {
-      res.status(500).json({ done: false, error });
-    });
+    }).catch(error =>
+      res.status(500).json({ done: false, error })
+    );
   }
 
   /**

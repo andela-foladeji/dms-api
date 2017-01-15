@@ -1,6 +1,6 @@
-import app from '../../server/index';
 import supertest from 'supertest';
 import { assert } from 'chai';
+import app from '../../server/index';
 import db from '../../server/models';
 import fakeData from '../fake-data';
 
@@ -52,7 +52,7 @@ describe('Roles related activites', () => {
           assert.isFalse(res.body.done);
           done();
         });
-    })
+    });
 
     it('prevents a non admin user from creating a role', (done) => {
       fakeData.user2.roleId = 2;

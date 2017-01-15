@@ -13,7 +13,6 @@ describe('Document model', () => {
         userInfo = user;
         done();
       });
-      
     });
   });
 
@@ -63,7 +62,7 @@ describe('Document model', () => {
       const newDocDetails = {};
       Object.assign(newDocDetails, fakeData.document);
       newDocDetails.ownerId = 0;
-      db.document.create(newDocDetails).then((theDocument) => 
+      db.document.create(newDocDetails).then(theDocument =>
         assert.isUndefined(theDocument)
       ).catch(error =>
         assert.equal(error.name, 'SequelizeForeignKeyConstraintError')
@@ -81,6 +80,6 @@ describe('Document model', () => {
           assert.match(error.message, /^notNull/)
         );
       });
-    })
+    });
   });
 });
