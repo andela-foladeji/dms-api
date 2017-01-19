@@ -14,7 +14,7 @@ service:
   - postgresql
 
 before_script:
-  - psql -c 'create database dms_test;' -U postgres
+  - psql -c 'create database travis;' -U postgres
   - npm run db-init
 
 after_script:

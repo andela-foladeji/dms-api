@@ -9,7 +9,7 @@ const db = {};
 let sequelize;
 
 if (process.env.NODE_ENV === 'production') {
-  sequelize = new Sequelize(process.env.DATABASE_URL);
+  sequelize = new Sequelize(config.connection);
 } else {
   sequelize = new Sequelize(config.db.database, config.db.user,
 config.db.password, config.db.options);
