@@ -150,6 +150,23 @@ describe('Document related activities', () => {
           done();
         });
     });
+
+    it(`declines access for a role document when
+      requested by a different role`, (done) => {
+      db.role.create(fakeData.role2).then((role) => {
+        fakeData.user3.roleId = role.id;
+        request.post('/users')
+          .send(fakeData.user3)
+          .end((err, res) => {
+            request.get('/documents/3')
+              .set({ Authorization: res.body.token })
+              .end((err2, res2) => {
+                assert.equal(res2.status, 401);
+                done();
+              });
+          });
+      });
+    });
   });
 
   describe('PUT /documents/:id to update a document details', () => {
