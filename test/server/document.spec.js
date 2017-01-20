@@ -69,6 +69,19 @@ describe('Document related activities', () => {
         });
     });
 
+    it('rejects creation if ownerId is not id of the logged in user', (done) => {
+      let invalidDoc = {};
+      Object.assign(invalidDoc, fakeData.document);
+      invalidDoc.ownerId = 5;
+      request.post('/documents')
+        .set({ Authorization: token })
+        .send(invalidDoc)
+        .end((err, res) => {
+          assert.equal(res.status, 401);
+          done();
+        });
+    });
+
     it('sets access to public by default', (done) => {
       request.post('/documents')
         .set({ Authorization: token })
@@ -168,8 +181,8 @@ describe('Document related activities', () => {
 
   describe('PUT /documents/:id to update a document details', () => {
     it('should update details of the document', (done) => {
-      request.put('/documents/1')
-        .set({ Authorization: token })
+      request.put('/documents/3')
+        .set({ Authorization: token2 })
         .send(fakeData.updateDoc)
         .end((err, res) => {
           if (err) {
@@ -236,6 +249,24 @@ describe('Document related activities', () => {
         });
     });
 
+    it('returns error for invalid page', (done) => {
+      request.get('/documents/?page=-1&limit=2')
+        .set({ Authorization: token2 })
+        .end((err, res) => {
+          assert.equal(res.status, 400);
+          done();
+        });
+    });
+
+    it('returns error for invalid limit', (done) => {
+      request.get('/documents/?limit=-2')
+        .set({ Authorization: token2 })
+        .end((err, res) => {
+          assert.equal(res.status, 400);
+          done();
+        });
+    });
+
     it('gets all documents with role query', (done) => {
       request.get('/documents/?role=1')
         .set({ Authorization: token2 })
@@ -252,8 +283,8 @@ describe('Document related activities', () => {
 
   describe('DELETE /documents/:id to delete a document', () => {
     it('should delete a document', (done) => {
-      request.delete('/documents/1')
-        .set({ Authorization: token })
+      request.delete('/documents/3')
+        .set({ Authorization: token2 })
         .end((err, res) => {
           assert.equal(res.status, 200);
           done();
@@ -278,6 +309,66 @@ describe('Document related activities', () => {
           assert.equal(res.status, 200);
           assert.isArray(res.body.doc);
           assert.equal(res.body.doc.length, 2);
+          done();
+        });
+    });
+  });
+
+  describe('GET /search documents to search documents', () => {
+    it('retrieves documents with the title query', (done) => {
+      request.get(`/documents/search?searchText=${fakeData.document.title}`)
+        .set({ Authorization: token })
+        .end((err, res) => {
+          assert.equal(res.body.doc.length, 1);
+          assert.equal(res.body.doc[0].content, fakeData.document.content);
+          done();
+        });
+    });
+
+    it('retrieves the number of documents specified in the limit', (done) => {
+      request.get(`/documents/search?searchText=title&limit=1`)
+        .set({ Authorization: token })
+        .end((err, res) => {
+          assert.equal(res.body.doc.length, 1);
+          assert.equal(res.body.doc[0].title, fakeData.privateDoc.title);
+          done();
+        });
+    });
+
+    it('retrieves documents corresponding to the page', (done) => {
+      request.get(`/documents/search?searchText=title&limit=1&page=2`)
+        .set({ Authorization: token })
+        .end((err, res) => {
+          assert.equal(res.body.doc.length, 1);
+          assert.equal(res.body.doc[0].title, fakeData.document.title);
+          done();
+        });
+    })
+
+    it('returns error if limit specified is invalid', () => {
+      request.get(`/documents/search?searchText=title&limit=-1`)
+        .set({ Authorization: token })
+        .end((err, res) => {
+          assert.equal(res.status, 400);
+          done();
+        });
+    });
+
+    it('returns error if page specified is invalid', () => {
+      request.get(`/documents/search?searchText=title&page=-1`)
+        .set({ Authorization: token })
+        .end((err, res) => {
+          assert.equal(res.status, 400);
+          done();
+        });
+    });
+
+    it('retrieves documents based on publishedDate value', (done) => {
+      request.get(`/documents/search?searchText=title&publishedDate=DESC`)
+        .set({ Authorization: token })
+        .end((err, res) => {
+          assert.equal(res.body.doc.length, 2);
+          assert.isAbove(new Date(res.body.doc[0].createdAt), new Date(res.body.doc[1].createdAt));
           done();
         });
     });

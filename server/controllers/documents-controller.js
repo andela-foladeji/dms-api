@@ -21,11 +21,6 @@ class DocumentsController extends Helper {
         doc: docInfo.dataValues
       }))
       .catch((error) => {
-        if (error.name === 'SequelizeForeignKeyConstraintError') {
-          return res.status(400).json({
-            message: 'User does not exist'
-          });
-        }
         if (error.errors[0].type === 'notNull Violation' ||
         error.errors[0].type === 'unique violation') {
           return res.status(400).json({

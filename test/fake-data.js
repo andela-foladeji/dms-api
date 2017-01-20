@@ -29,11 +29,11 @@ const fakeData = {
     title: 'User'
   },
   document: {
-    title: faker.lorem.words(),
+    title: `${faker.lorem.words()} = title`,
     content: faker.lorem.paragraph()
   },
   privateDoc: {
-    title: faker.lorem.words(),
+    title: `${faker.lorem.words()} = title`,
     content: faker.lorem.paragraph(),
     access: 'private'
   },
