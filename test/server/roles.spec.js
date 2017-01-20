@@ -37,7 +37,6 @@ describe('Roles related activites', () => {
         .send(fakeData.role2)
         .end((err, res) => {
           assert.equal(res.status, 200);
-          assert.isTrue(res.body.done);
           assert.isDefined(res.body.role);
           done();
         });
@@ -49,7 +48,6 @@ describe('Roles related activites', () => {
         .send(fakeData.role2)
         .end((err, res) => {
           assert.equal(res.status, 400);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -65,7 +63,6 @@ describe('Roles related activites', () => {
             .send(fakeData.role2)
             .end((err, res) => {
               assert.equal(res.status, 401);
-              assert.isFalse(res.body.done);
               assert.isUndefined(res.body.role);
               done();
             });

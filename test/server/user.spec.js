@@ -36,7 +36,6 @@ describe('User Actions', () => {
         .send(fakeData.user)
         .end((error, res) => {
           assert.equal(res.status, 200);
-          assert.isTrue(res.body.done);
           done();
         });
     });
@@ -47,7 +46,6 @@ describe('User Actions', () => {
         .send(fakeData.user2)
         .end((error, res) => {
           assert.equal(res.status, 400);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -58,7 +56,6 @@ describe('User Actions', () => {
         .send(fakeData.user2)
         .end((error, res) => {
           assert.equal(res.status, 200);
-          assert.isTrue(res.body.done);
           done();
         });
     });
@@ -69,7 +66,6 @@ describe('User Actions', () => {
         .send(fakeData.user)
         .end((error, res) => {
           assert.equal(res.status, 400);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -82,7 +78,6 @@ describe('User Actions', () => {
           .send(incompleteUser)
           .end((error, res) => {
             assert.equal(res.status, 400);
-            assert.isFalse(res.body.done);
             done();
           });
       });
@@ -99,7 +94,6 @@ describe('User Actions', () => {
         })
         .end((error, res) => {
           assert.equal(res.status, 200);
-          assert.isTrue(res.body.done);
           assert.isDefined(res.body.token);
           token = res.body.token;
           done();
@@ -114,7 +108,6 @@ describe('User Actions', () => {
         })
         .end((error, res) => {
           assert.equal(res.status, 401);
-          assert.isFalse(res.body.done);
           assert.isUndefined(res.body.token);
           done();
         });
@@ -128,7 +121,6 @@ describe('User Actions', () => {
         })
         .end((error, res) => {
           assert.equal(res.status, 401);
-          assert.isFalse(res.body.done);
           assert.isUndefined(res.body.token);
           done();
         });
@@ -196,7 +188,6 @@ describe('User Actions', () => {
         .end((err, res) => {
           assert.equal(res.status, 401);
           assert.isUndefined(res.body.user);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -221,7 +212,6 @@ describe('User Actions', () => {
         .end((err, res) => {
           assert.equal(res.status, 401);
           assert.isUndefined(res.body.user);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -232,7 +222,6 @@ describe('User Actions', () => {
       request.delete('/users/2')
         .end((err, res) => {
           assert.equal(res.status, 401);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -242,7 +231,6 @@ describe('User Actions', () => {
         .set({ Authorization: token })
         .end((err, res) => {
           assert.equal(res.status, 200);
-          assert.isTrue(res.body.done);
           done();
         });
     });

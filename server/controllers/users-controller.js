@@ -1,13 +1,14 @@
 import bCrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import db from '../models';
+import Helper from './helper';
 
 require('dotenv').config({ silent: true });
 /**
  * UsersController class to handle all Users
  * related actions
  */
-class UsersController {
+class UsersController extends Helper{
 
   /**
    * method fetchUser to create a User
@@ -15,8 +16,8 @@ class UsersController {
    * @return {object} formatted object containing user information;
    */
   static fetchUser(userInfo) {
-    const { firstName, lastName, username, createdAt, email, id } = userInfo;
-    return { firstName, lastName, username, createdAt, email, id };
+    const { firstName, lastName, username, createdAt, email, id, roleId } = userInfo;
+    return { firstName, lastName, username, createdAt, email, id, roleId };
   }
 
   /**
@@ -33,7 +34,6 @@ class UsersController {
           const token = jwt.sign({ id: userDetails.id, role },
             process.env.SECRET, { expiresIn: '24h' });
           res.status(200).json({
-            done: true,
             user: userDetails,
             token
           });
@@ -41,19 +41,18 @@ class UsersController {
       }).catch((error) => {
         if (error.name === 'SequelizeForeignKeyConstraintError') {
           return res.status(400).json({
-            done: false,
             message: 'Role does not exist'
           });
         }
         if (error.errors[0].type === 'unique violation') {
-          return res.status(400).json({ done: false,
+          return res.status(400).json({
             message: `${error.errors[0].path} already exists` });
         }
         if (error.errors[0].type === 'notNull Violation') {
-          return res.status(400).json({ done: false,
+          return res.status(400).json({
             message: `${error.errors[0].path} is required` });
         }
-        res.status(500).json({ done: false });
+        res.status(500).json({ error });
       });
   }
 
@@ -79,22 +78,19 @@ class UsersController {
             role: userDetails[0].dataValues.role.dataValues.title
           }, process.env.SECRET, { expiresIn: '24h' });
           return res.status(200).json({
-            done: true,
             token,
             user: userInfo
           });
         }
         return res.status(401).json({
-          done: false,
           message: 'Invalid user details'
         });
       }
       return res.status(401).json({
-        done: false,
         message: 'Invalid user details'
       });
-    }).catch(() => {
-      res.status(500).json({ done: false });
+    }).catch((error) => {
+      res.status(500).json({ error });
     });
   }
 
@@ -113,12 +109,11 @@ class UsersController {
         ]
       }).then(allUsers =>
         res.status(200).json({
-          done: true,
           allUsers
         })
       );
     } else {
-      UsersController.returnUnAuthroized(res);
+      Helper.returnUnAuthorized(res);
     }
   }
 
@@ -129,20 +124,21 @@ class UsersController {
    * @return {object} userObject details;
    */
   static getAUser(req, res) {
-    if (req.decoded.id === parseInt(req.params.id, 10)) {
-      db.user.findById(req.decoded.id, {
+    if ((req.decoded.id === parseInt(req.params.id, 10)) ||
+    req.decoded.role.toLowerCase() === 'admin') {
+      db.user.findById(req.params.id, {
         attributes: [
           'id', 'firstName', 'lastName', 'email', 'username',
           'createdAt', 'updatedAt', 'roleId'
         ]
-      }).then(theUser =>
-        res.status(200).json({
-          done: true,
-          user: theUser.dataValues
-        })
-      );
+      }).then((theUser) => {
+        if(theUser) {
+          return res.status(200).json({ user: theUser.dataValues });
+        }
+        return res.status(404).json({ message: 'User not found' });
+      });
     } else {
-      UsersController.returnUnAuthroized(res);
+      Helper.returnUnAuthorized(res);
     }
   }
 
@@ -163,30 +159,16 @@ class UsersController {
         returning: true
       }).then(updatedUser =>
         res.status(200).json({
-          done: true,
           user: UsersController.fetchUser(updatedUser[1][0].dataValues)
         })
       ).catch(error =>
         res.status(400).json({
-          done: false,
           message: error.errors[0].message
         })
       );
     } else {
-      UsersController.returnUnAuthroized(res);
+      Helper.returnUnAuthorized(res);
     }
-  }
-
-  /**
-   * method returnUnAuthroized is to return Unauthorized message
-   * @param {object} res; the response obect
-   * @returns {object} response sent to the frontend
-   */
-  static returnUnAuthroized(res) {
-    return res.status(401).json({
-      done: false,
-      message: 'Unauthorized request'
-    });
   }
 
   /**
@@ -201,12 +183,11 @@ class UsersController {
         res.status(200).json({ done: true })
       ).catch(error =>
         res.status(400).json({
-          done: false,
           message: error.errors[0].message
         })
       );
     } else {
-      UsersController.returnUnAuthroized(res);
+      Helper.returnUnAuthorized(res);
     }
   }
 

@@ -9,7 +9,7 @@ const request = supertest(app);
 describe('Document related activities', () => {
   let roleId, token, token2;
   const incompleteDoc = {};
-  const requiredFields = ['title', 'content', 'ownerId'];
+  const requiredFields = ['title', 'content'];
   before((done) => {
     db.role.create(fakeData.role1).then((role) => {
       roleId = role.dataValues.id;
@@ -26,7 +26,6 @@ describe('Document related activities', () => {
               .send(fakeData.user2)
               .end((err3, res3) => {
                 if (!err3) {
-                  fakeData.document.ownerId = res3.body.user.id;
                   token2 = res3.body.token;
                   done();
                 }
@@ -66,7 +65,6 @@ describe('Document related activities', () => {
             return done(err);
           }
           assert.equal(res.status, 401);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -106,14 +104,13 @@ describe('Document related activities', () => {
         Object.assign(incompleteDoc, fakeData.document);
         delete incompleteDoc[field];
         request.post('/documents')
-          .set({ Authorization: token2 })
+          .set({ Authorization: token })
           .send(incompleteDoc)
           .end((err, res) => {
             if (err) {
               return done(err);
             }
             assert.equal(res.status, 400);
-            assert.isFalse(res.body.done);
             done();
           });
       });
@@ -193,7 +190,6 @@ describe('Document related activities', () => {
             done(err);
           }
           assert.equal(res.status, 500);
-          assert.isFalse(res.body.done);
           done();
         });
     });
@@ -227,8 +223,21 @@ describe('Document related activities', () => {
         });
     });
 
-    it('gets all documents with pagination option', (done) => {
-      request.get('/documents/?page=1&limit=10')
+    it('gets the last two documents with pagination option', (done) => {
+      request.get('/documents/?page=1&limit=2')
+        .set({ Authorization: token2 })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.isArray(res.body.doc);
+          assert.equal(res.body.doc.length, 2);
+          assert.isAtLeast(res.body.doc[0].createdAt,
+            res.body.doc[1].createdAt);
+          done();
+        });
+    });
+
+    it('gets all documents with role query', (done) => {
+      request.get('/documents/?role=1')
         .set({ Authorization: token2 })
         .end((err, res) => {
           assert.equal(res.status, 200);
@@ -247,17 +256,15 @@ describe('Document related activities', () => {
         .set({ Authorization: token })
         .end((err, res) => {
           assert.equal(res.status, 200);
-          assert.isTrue(res.body.done);
           done();
         });
     });
 
     it('shouldn\'t delete a document not created by you', (done) => {
       request.delete('/documents/2')
-        .set({ Authorization: token })
+        .set({ Authorization: token2 })
         .end((err, res) => {
           assert.equal(res.status, 401);
-          assert.isFalse(res.body.done);
           done();
         });
     });

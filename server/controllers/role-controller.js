@@ -1,5 +1,6 @@
 import db from '../models';
 import user from './users-controller';
+import Helper from './helper';
 /**
  * RoleController class to handle all role
  * related actions
@@ -16,11 +17,11 @@ class RoleController {
       db.role.create(req.body)
         .then((role) => {
           res.status(200).json({ role: role.dataValues, done: true });
-        }).catch(() => {
-          res.status(400).json({ done: false });
+        }).catch((error) => {
+          res.status(400).json({ error });
         });
     } else {
-      user.returnUnAuthroized(res);
+      Helper.returnUnAuthorized(res);
     }
   }
 
@@ -32,9 +33,9 @@ class RoleController {
    */
   static getRoles(req, res) {
     db.role.findAll().then((roles) => {
-      res.status(200).json({ done: true, roles });
+      res.status(200).json({ roles });
     }).catch((error) => {
-      res.status(500).json({ done: false, error });
+      res.status(500).json({ error });
     });
   }
 }
