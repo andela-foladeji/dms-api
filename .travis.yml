@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+  - node
+
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get -qq update
+  - sudo apt-get -qq install g++-4.8
+
+env:
+  - CXX=g++-4.8
+  
+service:
+  - postgresql
+
+before_script:
+  - psql -c 'create database travis;' -U postgres
+  - npm run db-init
+
+after_script:
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
