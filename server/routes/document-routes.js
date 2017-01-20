@@ -8,6 +8,8 @@ docRoute.route('/')
   .post(Authentication.verify, docController.createDocument)
   .get(Authentication.verify, docController.getAllDocuments);
 
+docRoute.get('/search/', Authentication.verify, docController.searchDocuments);
+
 docRoute.route('/:id')
   .get(Authentication.verify, docController.getADocument)
   .delete(Authentication.verify, docController.deleteDocument)

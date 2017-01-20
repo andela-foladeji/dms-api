@@ -123,12 +123,7 @@ class DocumentsController extends Helper {
       options.where = {
           $or: [
             { access: 'public' },
-            {
-              $and: {
-                access: 'private',
-                ownerId: req.decoded.id
-              }
-            }
+            { ownerId: req.decoded.id }
           ]
         };
     }
@@ -147,6 +142,56 @@ class DocumentsController extends Helper {
     db.document.findAll(options).then(documents =>
       res.status(200).json({ doc: documents })
     ).catch((error) => res.status(500).json({ error }));
+  }
+
+  static searchDocuments(req, res) {
+    let options = {};
+    const searchText = req.query.searchText;
+    if(req.query.publishedDate) {
+      options.order = [['createdAt', req.query.publishedDate]];
+    }
+    options.where = {
+          $and: [{
+            $or: [
+              { access: 'public' },
+              { ownerId: req.decoded.id }
+            ]
+          }]
+        };
+    if(searchText) {
+      options.where.$and.push({ $or: [
+        { title: { $like: `%${searchText}%` }},
+        { content: { $like: `%${searchText}%` }}
+      ] });
+    }
+    if (req.query.limit) {
+      if (req.query.limit < 1) {
+        return res.status(400).json({ message: 'Invalid limit specified'});
+      }
+      options.limit = req.query.limit;
+    }
+    if (req.query.page) {
+      if (req.query.page < 1 || !req.query.limit) {
+        return res.status(400).json({ message: 'Invalid page/limit specified'});
+      }
+      options.offset = (req.query.page - 1) * req.query.limit;
+    }
+    if(req.query.role) {
+      options.include = [{
+        model: db.user,
+        as: 'owner',
+        attributes: [],
+        include: [{
+          model: db.role,
+          attributes: [],
+          where: { id: req.query.role }
+        }]
+      }];
+    }
+
+    db.document.findAll(options).then(documents =>
+      res.status(200).json({ doc: documents })
+    ).catch(error => res.status(500).json({ error }));
   }
 }
 
