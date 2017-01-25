@@ -10,7 +10,7 @@ describe('User model', () => {
   const incompleteUser = {};
   const newUser = {};
   before((done) => {
-    db.role.create(fakeData.role1).then((role) => {
+    db.role.create(fakeData.adminRole).then((role) => {
       roleId = role.dataValues.id;
       done();
     });

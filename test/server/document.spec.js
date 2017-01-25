@@ -11,7 +11,7 @@ describe('Document related activities', () => {
   const incompleteDoc = {};
   const requiredFields = ['title', 'content'];
   before((done) => {
-    db.role.create(fakeData.role1).then((role) => {
+    db.role.create(fakeData.adminRole).then((role) => {
       roleId = role.dataValues.id;
       fakeData.user.roleId = roleId;
       request.post('/users')
@@ -163,7 +163,7 @@ describe('Document related activities', () => {
 
     it(`declines access for a role document when
       requested by a different role`, (done) => {
-      db.role.create(fakeData.role2).then((role) => {
+      db.role.create(fakeData.regularRole).then((role) => {
         fakeData.user3.roleId = role.id;
         request.post('/users')
           .send(fakeData.user3)
