@@ -13,9 +13,9 @@ describe('User Actions', () => {
   let roleId1, roleId2, token;
   let incompleteUser = {};
   before((done) => {
-    db.role.create(fakeData.role1).then((role) => {
+    db.role.create(fakeData.adminRole).then((role) => {
       roleId1 = role.dataValues.id;
-      db.role.create(fakeData.role2).then((newRole) => {
+      db.role.create(fakeData.regularRole).then((newRole) => {
         roleId2 = newRole.dataValues.id;
         done();
       });

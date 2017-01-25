@@ -9,7 +9,7 @@ const request = supertest(app);
 describe('Roles related activites', () => {
   let roleId, token;
   before((done) => {
-    db.role.create(fakeData.role1).then((role) => {
+    db.role.create(fakeData.adminRole).then((role) => {
       roleId = role.dataValues.id;
       fakeData.user.roleId = roleId;
       request.post('/users')
@@ -34,7 +34,7 @@ describe('Roles related activites', () => {
     it('allows only an admin to create role', (done) => {
       request.post('/role')
         .set({ Authorization: token })
-        .send(fakeData.role2)
+        .send(fakeData.regularRole)
         .end((err, res) => {
           assert.equal(res.status, 200);
           assert.isDefined(res.body.role);
@@ -45,7 +45,17 @@ describe('Roles related activites', () => {
     it('ensures that title is not null', (done) => {
       request.post('/role')
         .set({ Authorization: token })
-        .send(fakeData.role2)
+        .send(fakeData.regularRole)
+        .end((err, res) => {
+          assert.equal(res.status, 400);
+          done();
+        });
+    });
+
+    it('prevents creation of an existing role', (done) => {
+      request.post('/role')
+        .set({ Authorization: token })
+        .send(fakeData.regularRole)
         .end((err, res) => {
           assert.equal(res.status, 400);
           done();
@@ -60,7 +70,7 @@ describe('Roles related activites', () => {
           const user2Token = res.body.token;
           request.post('/role')
             .set({ Authorization: user2Token })
-            .send(fakeData.role2)
+            .send(fakeData.regularRole)
             .end((err, res) => {
               assert.equal(res.status, 401);
               assert.isUndefined(res.body.role);

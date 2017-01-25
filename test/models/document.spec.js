@@ -6,7 +6,7 @@ describe('Document model', () => {
   let roleId, userInfo;
   const required = ['title', 'content'];
   beforeEach((done) => {
-    db.role.create(fakeData.role1).then((role) => {
+    db.role.create(fakeData.adminRole).then((role) => {
       roleId = role.dataValues.id;
       fakeData.user.roleId = roleId;
       db.user.create(fakeData.user).then((user) => {

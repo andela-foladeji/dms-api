@@ -22,11 +22,14 @@ const fakeData = {
     email: faker.internet.email(),
     password: faker.internet.password()
   },
-  role1: {
+  adminRole: {
     title: 'Admin'
   },
-  role2: {
-    title: 'User'
+  regularRole: {
+    title: 'Regular'
+  },
+  newRole: {
+    title: 'normal'
   },
   document: {
     title: `${faker.lorem.words()} = title`,
